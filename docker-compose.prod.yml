@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  nginx:
+    image: nginx:alpine
+    container_name: planing-ita-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./dist:/usr/share/nginx/html:ro
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+      - nginx-logs:/var/log/nginx
+    restart: unless-stopped
+    depends_on:
+      - app
+    networks:
+      - planing-network
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+    container_name: planing-ita-app
+    environment:
+      - NODE_ENV=production
+    volumes:
+      - ./dist:/app/dist:ro
+    restart: unless-stopped
+    networks:
+      - planing-network
+
+  certbot:
+    image: certbot/certbot
+    container_name: planing-ita-certbot
+    volumes:
+      - /etc/letsencrypt:/etc/letsencrypt
+      - /var/lib/letsencrypt:/var/lib/letsencrypt
+      - ./dist:/usr/share/nginx/html
+    command: certonly --webroot --webroot-path=/usr/share/nginx/html --email admin@planing-ita.com --agree-tos --no-eff-email -d planing-ita.com -d www.planing-ita.com
+    networks:
+      - planing-network
+
+volumes:
+  nginx-logs:
+
+networks:
+  planing-network:
+    driver: bridge
