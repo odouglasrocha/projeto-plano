@@ -1,0 +1,78 @@
+version: '3.8'
+
+services:
+  # Frontend (Nginx + React)
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+    container_name: planing-ita-frontend
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+      - nginx-logs:/var/log/nginx
+    restart: unless-stopped
+    depends_on:
+      - backend
+    networks:
+      - planing-network
+
+  # Backend (Node.js + Express + MongoDB)
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: planing-ita-backend
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=production
+      - MONGODB_URI=mongodb://mongodb:27017/planing-ita
+      - JWT_SECRET=your-super-secret-jwt-key-change-this-in-production
+      - JWT_EXPIRES_IN=7d
+      - PORT=3001
+      - CORS_ORIGIN=https://planing-ita.com
+    restart: unless-stopped
+    depends_on:
+      - mongodb
+    networks:
+      - planing-network
+
+  # MongoDB Database
+  mongodb:
+    image: mongo:7.0
+    container_name: planing-ita-mongodb
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=admin123
+      - MONGO_INITDB_DATABASE=planing-ita
+    volumes:
+      - mongodb-data:/data/db
+      - ./backend/scripts:/docker-entrypoint-initdb.d:ro
+    restart: unless-stopped
+    networks:
+      - planing-network
+
+  # Certbot for SSL certificates
+  certbot:
+    image: certbot/certbot
+    container_name: planing-ita-certbot
+    volumes:
+      - /etc/letsencrypt:/etc/letsencrypt
+      - /var/lib/letsencrypt:/var/lib/letsencrypt
+      - ./dist:/usr/share/nginx/html
+    command: certonly --webroot --webroot-path=/usr/share/nginx/html --email admin@planing-ita.com --agree-tos --no-eff-email -d planing-ita.com -d www.planing-ita.com
+    networks:
+      - planing-network
+
+volumes:
+  nginx-logs:
+  mongodb-data:
+
+networks:
+  planing-network:
+    driver: bridge
