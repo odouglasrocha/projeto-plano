@@ -224,7 +224,7 @@ export default function Settings() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Target className="h-5 w-5 text-primary" />
-                Configurações OEE
+                Configurações Motor+
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -260,7 +260,7 @@ export default function Settings() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="oeeTarget">Meta OEE Geral (%)</Label>
+                  <Label htmlFor="oeeTarget">Meta Motor+ Geral (%)</Label>
                   <Input
                     id="oeeTarget"
                     type="number"
@@ -289,7 +289,7 @@ export default function Settings() {
               </div>
 
               <div className="flex items-center justify-between">
-                <Label htmlFor="autoCalculation">Cálculo Automático OEE</Label>
+                <Label htmlFor="autoCalculation">Cálculo Automático Motor+</Label>
                 <Switch
                   id="autoCalculation"
                   checked={Boolean(localSettings.auto_calculation)}
@@ -299,7 +299,7 @@ export default function Settings() {
 
               <Button onClick={handleSaveOeeSettings} className="w-full">
                 <Save className="h-4 w-4 mr-2" />
-                Salvar Configurações OEE
+                Salvar Configurações Motor+
               </Button>
             </CardContent>
           </Card>
@@ -333,7 +333,7 @@ export default function Settings() {
                 </div>
 
                 <div className="flex items-center justify-between">
-                  <Label htmlFor="lowOeeAlerts">Alertas de OEE Baixo</Label>
+                  <Label htmlFor="lowOeeAlerts">Alertas de Motor+ Baixo</Label>
                   <Switch
                     id="lowOeeAlerts"
                     checked={Boolean(localSettings.low_oee_alerts)}

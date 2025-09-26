@@ -36,7 +36,7 @@ export function useReports() {
   const reportTemplates: ReportTemplate[] = [
     {
       id: "oee-daily",
-      name: "Relatório OEE Diário",
+      name: "Relatório Motor+ Diário",
       description: "Análise completa de disponibilidade, performance e qualidade por dia",
       icon: "BarChart3",
       color: "bg-blue-500"

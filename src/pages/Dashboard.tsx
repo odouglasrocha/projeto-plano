@@ -86,7 +86,7 @@ export default function Dashboard() {
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Dashboard OEE</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Dashboard Motor+</h1>
           <p className="text-sm sm:text-base text-muted-foreground">
             Visão geral da eficiência em tempo real
           </p>
@@ -124,7 +124,7 @@ export default function Dashboard() {
           icon={<Target className="h-5 w-5" />}
         />
         <OEECard
-          title="OEE Geral"
+          title="Motor+ Geral"
           value={oeeData.overall.value}
           target={oeeData.overall.target}
           trend={oeeData.overall.trend}

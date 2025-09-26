@@ -107,7 +107,7 @@ export function AppSidebar({ userRole = 'operador' }: AppSidebarProps) {
           <div className="flex items-center gap-2">
             <Factory className="h-6 w-6 text-primary" />
             <div>
-              <h2 className="font-semibold text-sm">Sistema OEE</h2>
+              <h2 className="font-semibold text-sm">Sistema Motor+</h2>
               <div className="flex items-center gap-1 text-xs text-muted-foreground">
                 <RoleIcon className="h-3 w-3" />
                 <span>{getRoleLabel(userRole)}</span>
