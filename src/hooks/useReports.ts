@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 
-const API_BASE_URL = 'http://localhost:3001/api';
+const API_BASE_URL = process.env.NODE_ENV === 'production' 
+  ? 'https://planing-ita.com/api' 
+  : 'http://localhost:3001/api';
 
 export interface Report {
   _id: string;
