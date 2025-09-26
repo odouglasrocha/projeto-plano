@@ -277,12 +277,19 @@ export default function Losses() {
                                 {safeNumberFromMongo(loss.amount).toFixed(1)} {lossType?.unit || 'kg'}
                               </p>
                               <p className="text-xs text-muted-foreground">
-                                {new Date(loss.recorded_at).toLocaleString('pt-BR', { 
-                                  day: '2-digit',
-                                  month: '2-digit',
-                                  hour: '2-digit', 
-                                  minute: '2-digit' 
-                                })}
+                                {(() => {
+                                  try {
+                                    const date = new Date(loss.recorded_at);
+                                    return isNaN(date.getTime()) ? 'Data inválida' : date.toLocaleString('pt-BR', { 
+                                      day: '2-digit',
+                                      month: '2-digit',
+                                      hour: '2-digit', 
+                                      minute: '2-digit' 
+                                    });
+                                  } catch {
+                                    return 'Data inválida';
+                                  }
+                                })()}
                               </p>
                             </div>
                           </div>

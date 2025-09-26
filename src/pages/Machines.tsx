@@ -49,11 +49,22 @@ export default function Machines() {
           return validStatuses.includes(status) ? status as any : 'idle';
         };
 
+        const formatLastUpdate = (updatedAt: any) => {
+          if (!updatedAt) return null;
+          try {
+            const date = new Date(updatedAt);
+            if (isNaN(date.getTime())) return null;
+            return date.toLocaleString('pt-BR');
+          } catch {
+            return null;
+          }
+        };
+
         return {
           id: machine._id,
           name: machine.name,
           status: getValidStatus(machine.status),
-          lastUpdate: new Date(machine.updatedAt).toLocaleString('pt-BR'),
+          lastUpdate: formatLastUpdate(machine.updatedAt),
           currentOrder: currentOrder?.code,
           efficiency: Math.round(efficiency),
           location: machine.location || 'N/A',
@@ -221,7 +232,7 @@ export default function Machines() {
                 
                 <div className="flex justify-between items-center pt-2 border-t">
                   <p className="text-xs text-muted-foreground">
-                    Atualizado {machine.lastUpdate}
+                    {machine.lastUpdate ? `Atualizado ${machine.lastUpdate}` : 'Nunca atualizado'}
                   </p>
                   <Button variant="outline" size="sm">
                     Detalhes

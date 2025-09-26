@@ -165,7 +165,7 @@ export default function Reports() {
                      <SelectContent>
                        <SelectItem value="all">Todas as máquinas</SelectItem>
                        {machines.map((machine) => (
-                         <SelectItem key={machine.id} value={machine.id}>
+                         <SelectItem key={machine._id} value={machine._id}>
                            {machine.name}
                          </SelectItem>
                        ))}
@@ -252,7 +252,7 @@ export default function Reports() {
               <CardContent>
                 <div className="space-y-3">
                   {reports.map((report) => (
-                    <div key={report.id} className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50 transition-colors">
+                    <div key={report._id} className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50 transition-colors">
                       <div className="flex items-center gap-3">
                         <div className="p-2 bg-primary/10 rounded-lg">
                           <FileText className="h-4 w-4 text-primary" />
@@ -260,7 +260,14 @@ export default function Reports() {
                         <div>
                           <h4 className="font-medium">{report.name}</h4>
                           <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                            <span>{new Date(report.created_at).toLocaleDateString('pt-BR')}</span>
+                            <span>{(() => {
+                              try {
+                                const date = new Date(report.createdAt);
+                                return isNaN(date.getTime()) ? 'Data inválida' : date.toLocaleDateString('pt-BR');
+                              } catch {
+                                return 'Data inválida';
+                              }
+                            })()}</span>
                             <span>•</span>
                             <span>{formatFileSize(report.file_size)}</span>
                             <Badge variant="outline" className="text-xs">
@@ -279,7 +286,7 @@ export default function Reports() {
                       <Button 
                         variant="outline" 
                         size="sm"
-                        onClick={() => handleDownloadReport(report.id)}
+                        onClick={() => handleDownloadReport(report._id)}
                         disabled={report.status !== 'completed'}
                       >
                         <Download className="h-4 w-4 mr-1" />

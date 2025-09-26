@@ -16,7 +16,7 @@ const createProductionRecords = async () => {
     await connectDB();
     
     // Get existing orders and operators
-    const orders = await ProductionOrder.find({ status: 'running' });
+    const orders = await ProductionOrder.find({ status: 'em_andamento' });
     const operators = await Operator.find();
     
     if (orders.length === 0) {

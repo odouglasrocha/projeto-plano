@@ -31,7 +31,7 @@ export default function Index() {
     const activeOrders = orders.filter(o => o.status === 'running');
     const performance = activeOrders.length > 0 ? 
       activeOrders.reduce((acc, order) => {
-        const produced = getTotalProduced(order.id);
+        const produced = getTotalProduced(order._id);
         return acc + (produced / order.planned_quantity) * 100;
       }, 0) / activeOrders.length : 0;
 
@@ -54,10 +54,10 @@ export default function Index() {
   const enrichedMachines = useMemo(() => {
     return machines.map(machine => {
       const currentOrder = orders.find(order => 
-        order.machine_id === machine.id && order.status === 'running'
+        order.machine_id?.toString() === machine._id?.toString() && order.status === 'em_andamento'
       );
       
-      const produced = currentOrder ? getTotalProduced(currentOrder.id) : 0;
+      const produced = currentOrder ? getTotalProduced(currentOrder._id) : 0;
       const efficiency = currentOrder && currentOrder.planned_quantity > 0 ? 
         Math.min((produced / currentOrder.planned_quantity) * 100, 100) : 0;
 
@@ -66,13 +66,24 @@ export default function Index() {
         return validStatuses.includes(status) ? status as any : 'idle';
       };
 
-      return {
-        name: machine.name,
-        status: getValidStatus(machine.status),
-        lastUpdate: new Date(machine.updated_at).toLocaleString('pt-BR'),
-        currentOrder: currentOrder?.code,
-        efficiency: Math.round(efficiency)
+      const formatLastUpdate = (updatedAt: any) => {
+        if (!updatedAt) return 'Nunca atualizado';
+        try {
+          const date = new Date(updatedAt);
+          if (isNaN(date.getTime())) return 'Data inválida';
+          return date.toLocaleString('pt-BR');
+        } catch {
+          return 'Data inválida';
+        }
       };
+
+        return {
+          name: machine.name,
+          status: getValidStatus(machine.status),
+          lastUpdate: formatLastUpdate(machine.updatedAt),
+          currentOrder: currentOrder?.code,
+          efficiency: Math.round(efficiency)
+        };
     });
   }, [machines, orders, getTotalProduced]);
 

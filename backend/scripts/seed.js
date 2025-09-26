@@ -221,7 +221,7 @@ const seedData = async (forceClean = false) => {
         planned_quantity: 1000,
         pallet_quantity: 50,
         machine_id: createdMachines[0]._id,
-        status: 'running',
+        status: 'em_andamento',
         shift: 'manha'
       },
       {
@@ -230,7 +230,7 @@ const seedData = async (forceClean = false) => {
         planned_quantity: 800,
         pallet_quantity: 40,
         machine_id: createdMachines[1]._id,
-        status: 'running',
+        status: 'em_andamento',
         shift: 'tarde'
       },
       {
@@ -239,7 +239,7 @@ const seedData = async (forceClean = false) => {
         planned_quantity: 1200,
         pallet_quantity: 60,
         machine_id: createdMachines[2]._id,
-        status: 'running',
+        status: 'em_andamento',
         shift: 'noite'
       },
       {

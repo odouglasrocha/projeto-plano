@@ -70,10 +70,21 @@ export default function Dashboard() {
         return validStatuses.includes(status) ? status as any : 'idle';
       };
 
+      const formatLastUpdate = (updatedAt: any) => {
+        if (!updatedAt) return 'Nunca atualizado';
+        try {
+          const date = new Date(updatedAt);
+          if (isNaN(date.getTime())) return 'Data inválida';
+          return date.toLocaleString('pt-BR');
+        } catch {
+          return 'Data inválida';
+        }
+      };
+
       return {
         name: machine.name,
         status: getValidStatus(machine.status),
-        lastUpdate: new Date(machine.updatedAt).toLocaleString('pt-BR'),
+        lastUpdate: formatLastUpdate(machine.updatedAt),
         currentOrder: currentOrder?.code,
         efficiency: Math.round(efficiency)
       };
@@ -145,7 +156,7 @@ export default function Dashboard() {
           icon={<Target className="h-5 w-5" />}
         />
         <OEECard
-          title="Motor+ Geral"
+          title="OEE Geral"
           value={oeeData.overall.value}
           target={oeeData.overall.target}
           trend={oeeData.overall.trend}

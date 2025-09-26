@@ -30,7 +30,7 @@ const machineSchema = new mongoose.Schema({
     default: 'idle'
   }
 }, {
-  timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' }
+  timestamps: true
 });
 
 // Indexes
