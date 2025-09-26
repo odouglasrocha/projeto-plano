@@ -9,15 +9,19 @@ import {
   BarChart3, 
   TrendingUp,
   AlertTriangle,
-  Factory
+  Factory,
+  Wifi,
+  WifiOff
 } from "lucide-react";
 import { useMachines } from "@/hooks/useMachines";
 import { useProductionOrders } from "@/hooks/useProductionOrders";
 import { useProductionRecords } from "@/hooks/useProductionRecords";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
+import { Button } from "@/components/ui/button";
 
 export default function Dashboard() {
-  const { machines, loading: machinesLoading } = useMachines();
+  const [realTimeEnabled, setRealTimeEnabled] = useState(true);
+  const { machines, loading: machinesLoading, realTimeEnabled: isRealTimeActive } = useMachines(realTimeEnabled);
   const { orders } = useProductionOrders();
   const { records, getTotalProduced } = useProductionRecords();
 
@@ -92,9 +96,22 @@ export default function Dashboard() {
             Visão geral da eficiência em tempo real
           </p>
         </div>
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <div className="h-2 w-2 bg-green-500 rounded-full animate-pulse" />
-          <span className="text-xs sm:text-sm">Atualizado em tempo real</span>
+        <div className="flex items-center gap-4">
+          <Button
+            variant={realTimeEnabled ? "default" : "outline"}
+            size="sm"
+            onClick={() => setRealTimeEnabled(!realTimeEnabled)}
+            className="flex items-center gap-2"
+          >
+            {realTimeEnabled ? <Wifi className="h-4 w-4" /> : <WifiOff className="h-4 w-4" />}
+            {realTimeEnabled ? "Tempo Real Ativo" : "Tempo Real Inativo"}
+          </Button>
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <div className={`h-2 w-2 rounded-full ${realTimeEnabled ? 'bg-green-500 animate-pulse' : 'bg-gray-400'}`} />
+            <span className="text-xs sm:text-sm">
+              {realTimeEnabled ? "Atualizado em tempo real" : "Atualização manual"}
+            </span>
+          </div>
         </div>
       </div>
 

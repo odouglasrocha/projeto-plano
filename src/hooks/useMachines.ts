@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useToast } from '@/hooks/use-toast';
 
 const API_BASE_URL = window.location.hostname === 'localhost' 
@@ -16,9 +16,10 @@ export interface Machine {
   updatedAt: string;
 }
 
-export function useMachines() {
+export function useMachines(realTimeEnabled: boolean = false) {
   const [machines, setMachines] = useState<Machine[]>([]);
   const [loading, setLoading] = useState(true);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const { toast } = useToast();
 
   const getAuthHeaders = () => {
@@ -150,7 +151,21 @@ export function useMachines() {
 
   useEffect(() => {
     fetchMachines();
-  }, []);
+    
+    // Setup real-time monitoring if enabled
+    if (realTimeEnabled) {
+      intervalRef.current = setInterval(() => {
+        fetchMachines();
+      }, 5000); // Update every 5 seconds
+    }
+    
+    // Cleanup interval on unmount
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+    };
+  }, [realTimeEnabled]);
 
   return {
     machines,
@@ -158,6 +173,7 @@ export function useMachines() {
     createMachine,
     updateMachine,
     deleteMachine,
-    refetch: fetchMachines
+    refetch: fetchMachines,
+    realTimeEnabled
   };
 }

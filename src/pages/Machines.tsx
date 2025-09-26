@@ -4,7 +4,7 @@ import { NewMachineModal } from "@/components/modals/NewMachineModal";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Filter, Search } from "lucide-react";
+import { Plus, Filter, Search, Wifi, WifiOff } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useMachines } from "@/hooks/useMachines";
 import { useProductionOrders } from "@/hooks/useProductionOrders";
@@ -12,7 +12,8 @@ import { useProductionRecords } from "@/hooks/useProductionRecords";
 import { useMemo, useState } from "react";
 
 export default function Machines() {
-  const { machines, loading, refetch } = useMachines();
+  const [realTimeEnabled, setRealTimeEnabled] = useState(true);
+  const { machines, loading, refetch, realTimeEnabled: isRealTimeActive } = useMachines(realTimeEnabled);
   const { orders } = useProductionOrders();
   const { getTotalProduced } = useProductionRecords();
   const [searchTerm, setSearchTerm] = useState("");
@@ -71,7 +72,18 @@ export default function Machines() {
             Monitore o status e performance de todas as máquinas
           </p>
         </div>
+        <div className="flex items-center gap-3">
+          <Button
+            variant={realTimeEnabled ? "default" : "outline"}
+            size="sm"
+            onClick={() => setRealTimeEnabled(!realTimeEnabled)}
+            className="flex items-center gap-2"
+          >
+            {realTimeEnabled ? <Wifi className="h-4 w-4" /> : <WifiOff className="h-4 w-4" />}
+            {realTimeEnabled ? "Tempo Real Ativo" : "Tempo Real Inativo"}
+          </Button>
           <NewMachineModal onMachineCreated={refetch} />
+        </div>
       </div>
 
       {/* Status Overview */}

@@ -60,9 +60,10 @@ export function useRealTimeEfficiency(refreshInterval: number = 30000) {
 
   const getAuthHeaders = () => {
     const token = localStorage.getItem('auth_token');
+    
     return {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
+      ...(token && { 'Authorization': `Bearer ${token}` })
     };
   };
 
@@ -75,11 +76,42 @@ export function useRealTimeEfficiency(refreshInterval: number = 30000) {
       });
 
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        const errorText = await response.text();
+        throw new Error(`HTTP error! status: ${response.status} - ${errorText}`);
       }
 
       const efficiencyData = await response.json();
-      setData(efficiencyData);
+      
+      // Verificar se os dados têm a estrutura esperada
+      if (efficiencyData && typeof efficiencyData === 'object') {
+        // Se os dados vêm diretamente como array de máquinas
+        if (Array.isArray(efficiencyData)) {
+          const processedData = {
+            timestamp: new Date().toISOString(),
+            machine_efficiency: efficiencyData,
+            oee_metrics: {
+              availability: { value: 0, target: 85, trend: 'stable' as const },
+              performance: { value: 0, target: 85, trend: 'stable' as const },
+              quality: { value: 0, target: 95, trend: 'stable' as const },
+              overall: { value: 0, target: 80, trend: 'stable' as const }
+            },
+            summary: {
+              total_machines: efficiencyData.length,
+              running_machines: efficiencyData.filter(m => m.machine_status === 'running').length,
+              active_orders: efficiencyData.filter(m => m.current_order).length,
+              total_produced: efficiencyData.reduce((sum, m) => sum + (m.produced_quantity || 0), 0),
+              total_rejects: efficiencyData.reduce((sum, m) => sum + (m.reject_quantity || 0), 0),
+              total_downtime: efficiencyData.reduce((sum, m) => sum + (m.downtime_minutes || 0), 0)
+            }
+          };
+          setData(processedData);
+        } else {
+          // Se os dados já têm a estrutura completa
+          setData(efficiencyData);
+        }
+      } else {
+        setData(null);
+      }
       setLastUpdated(new Date());
       
       // Only set loading to false after first successful fetch

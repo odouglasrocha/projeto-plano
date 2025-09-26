@@ -30,22 +30,22 @@ export function RealTimeEfficiencyOverview({
   refreshInterval = 30000 
 }: RealTimeEfficiencyOverviewProps) {
   const {
+    machineEfficiency,
     data,
     loading,
     error,
     lastUpdated,
     refresh,
+    getTopPerformingMachines,
+    getMachinesWithIssues,
     oeeMetrics,
-    machineEfficiency,
     summary,
     isConnected,
-    isStale,
-    getMachinesWithIssues,
-    getTopPerformingMachines
-  } = useRealTimeEfficiency(refreshInterval);
+    isStale
+  } = useRealTimeEfficiency(30000);
 
-  const machinesWithIssues = getMachinesWithIssues();
-  const topPerformingMachines = getTopPerformingMachines(3);
+  const topMachines = getTopPerformingMachines(3);
+  const problemMachines = getMachinesWithIssues();
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -276,9 +276,9 @@ export function RealTimeEfficiencyOverview({
             </CardTitle>
           </CardHeader>
           <CardContent>
-            {topPerformingMachines.length > 0 ? (
+            {topMachines.length > 0 ? (
               <div className="space-y-3">
-                {topPerformingMachines.map((machine, index) => (
+                {topMachines.map((machine, index) => (
                   <div key={machine.machine_id} className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <div className={cn("w-2 h-2 rounded-full", getStatusColor(machine.machine_status))} />
@@ -305,9 +305,9 @@ export function RealTimeEfficiencyOverview({
             </CardTitle>
           </CardHeader>
           <CardContent>
-            {machinesWithIssues.length > 0 ? (
+            {problemMachines.length > 0 ? (
               <div className="space-y-3">
-                {machinesWithIssues.slice(0, 5).map((machine) => (
+                {problemMachines.slice(0, 5).map((machine) => (
                   <div key={machine.machine_id} className="space-y-1">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">

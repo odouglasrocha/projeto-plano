@@ -62,10 +62,12 @@ export default function Login() {
 
     setLoading(true);
     try {
+      console.log('🔐 Tentando fazer login com:', { email, password: '***' });
       await signIn(email, password);
+      console.log('✅ Login realizado com sucesso!');
       navigate('/');
     } catch (error: any) {
-      console.error('Login error:', error);
+      console.error('❌ Erro no login:', error);
       // Error handling is done in the signIn function
     } finally {
       setLoading(false);
