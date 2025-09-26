@@ -1,5 +1,6 @@
 import { OEECard } from "@/components/dashboard/OEECard";
 import { MachineStatusCard } from "@/components/dashboard/MachineStatusCard";
+import { RealTimeEfficiencyOverview } from "@/components/dashboard/RealTimeEfficiencyOverview";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { 
   CheckCircle, 
@@ -27,10 +28,10 @@ export default function Dashboard() {
     const availability = totalMachines > 0 ? (runningMachines / totalMachines) * 100 : 0;
     
     // Calculate performance based on production records
-    const activeOrders = orders.filter(o => o.status === 'running');
+    const activeOrders = orders.filter(o => o.status === 'em_andamento');
     const performance = activeOrders.length > 0 ? 
       activeOrders.reduce((acc, order) => {
-        const produced = getTotalProduced(order.id);
+        const produced = getTotalProduced(order._id);
         return acc + (produced / order.planned_quantity) * 100;
       }, 0) / activeOrders.length : 0;
 
@@ -53,10 +54,10 @@ export default function Dashboard() {
   const enrichedMachines = useMemo(() => {
     return machines.map(machine => {
       const currentOrder = orders.find(order => 
-        order.machine_id === machine.id && order.status === 'running'
+        order.machine_id === machine._id && order.status === 'em_andamento'
       );
       
-      const produced = currentOrder ? getTotalProduced(currentOrder.id) : 0;
+      const produced = currentOrder ? getTotalProduced(currentOrder._id) : 0;
       const efficiency = currentOrder && currentOrder.planned_quantity > 0 ? 
         Math.min((produced / currentOrder.planned_quantity) * 100, 100) : 0;
 
@@ -68,7 +69,7 @@ export default function Dashboard() {
       return {
         name: machine.name,
         status: getValidStatus(machine.status),
-        lastUpdate: new Date(machine.updated_at).toLocaleString('pt-BR'),
+        lastUpdate: new Date(machine.updatedAt).toLocaleString('pt-BR'),
         currentOrder: currentOrder?.code,
         efficiency: Math.round(efficiency)
       };
@@ -96,6 +97,9 @@ export default function Dashboard() {
           <span className="text-xs sm:text-sm">Atualizado em tempo real</span>
         </div>
       </div>
+
+      {/* Real-Time Efficiency Overview */}
+      <RealTimeEfficiencyOverview />
 
       {/* OEE KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">

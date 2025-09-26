@@ -335,4 +335,129 @@ router.get('/totals/summary', auth, async (req, res) => {
   }
 });
 
+// Get real-time efficiency data (for dashboard)
+router.get('/efficiency/realtime', auth, async (req, res) => {
+  try {
+    const Machine = require('../models/Machine');
+    
+    // Get all machines with their current status
+    const machines = await Machine.find({});
+    
+    // Get all running orders with their production data
+    const runningOrders = await ProductionOrder.find({ status: 'em_andamento' })
+      .populate('machine_id', 'name status');
+    
+    // Calculate efficiency metrics for each machine
+    const machineEfficiency = await Promise.all(machines.map(async (machine) => {
+      // Find current running order for this machine
+      const currentOrder = runningOrders.find(order => 
+        order.machine_id && order.machine_id._id.toString() === machine._id.toString()
+      );
+      
+      let efficiency = 0;
+      let produced = 0;
+      let planned = 0;
+      let downtime = 0;
+      let rejects = 0;
+      
+      if (currentOrder) {
+        // Get production records for this order (last 24 hours)
+        const last24Hours = new Date(Date.now() - 24 * 60 * 60 * 1000);
+        const records = await ProductionRecord.find({
+          order_id: currentOrder._id,
+          recorded_at: { $gte: last24Hours }
+        });
+        
+        produced = records.reduce((sum, record) => sum + record.produced_quantity, 0);
+        rejects = records.reduce((sum, record) => sum + record.reject_quantity, 0);
+        downtime = records.reduce((sum, record) => sum + record.downtime_minutes, 0);
+        planned = currentOrder.planned_quantity;
+        
+        // Calculate efficiency as percentage of planned production achieved
+        efficiency = planned > 0 ? Math.min((produced / planned) * 100, 100) : 0;
+      }
+      
+      return {
+        machine_id: machine._id,
+        machine_name: machine.name,
+        machine_status: machine.status,
+        current_order: currentOrder ? {
+          id: currentOrder._id,
+          code: currentOrder.code,
+          product_name: currentOrder.product_name,
+          planned_quantity: currentOrder.planned_quantity
+        } : null,
+        efficiency: Math.round(efficiency * 10) / 10, // Round to 1 decimal
+        produced_quantity: produced,
+        reject_quantity: rejects,
+        downtime_minutes: downtime,
+        last_updated: new Date()
+      };
+    }));
+    
+    // Calculate overall OEE metrics
+    const runningMachines = machines.filter(m => m.status === 'running').length;
+    const totalMachines = machines.length;
+    const availability = totalMachines > 0 ? (runningMachines / totalMachines) * 100 : 0;
+    
+    // Calculate average performance from running orders
+    const activeOrdersEfficiency = machineEfficiency
+      .filter(m => m.current_order && m.efficiency > 0)
+      .map(m => m.efficiency);
+    
+    const performance = activeOrdersEfficiency.length > 0 
+      ? activeOrdersEfficiency.reduce((sum, eff) => sum + eff, 0) / activeOrdersEfficiency.length 
+      : 0;
+    
+    // Calculate quality (good production vs total production)
+    const totalProduced = machineEfficiency.reduce((sum, m) => sum + m.produced_quantity, 0);
+    const totalRejects = machineEfficiency.reduce((sum, m) => sum + m.reject_quantity, 0);
+    const quality = totalProduced > 0 ? ((totalProduced - totalRejects) / totalProduced) * 100 : 0;
+    
+    // Overall OEE calculation
+    const overall = (availability * performance * quality) / 10000;
+    
+    const oeeMetrics = {
+      availability: {
+        value: Math.round(availability * 10) / 10,
+        target: 85,
+        trend: availability >= 85 ? 'up' : availability >= 70 ? 'stable' : 'down'
+      },
+      performance: {
+        value: Math.round(performance * 10) / 10,
+        target: 90,
+        trend: performance >= 90 ? 'up' : performance >= 75 ? 'stable' : 'down'
+      },
+      quality: {
+        value: Math.round(quality * 10) / 10,
+        target: 95,
+        trend: quality >= 95 ? 'up' : quality >= 85 ? 'stable' : 'down'
+      },
+      overall: {
+        value: Math.round(overall * 10) / 10,
+        target: 80,
+        trend: overall >= 80 ? 'up' : overall >= 65 ? 'stable' : 'down'
+      }
+    };
+    
+    res.json({
+      timestamp: new Date(),
+      oee_metrics: oeeMetrics,
+      machine_efficiency: machineEfficiency,
+      summary: {
+        total_machines: totalMachines,
+        running_machines: runningMachines,
+        active_orders: runningOrders.length,
+        total_produced: totalProduced,
+        total_rejects: totalRejects,
+        total_downtime: machineEfficiency.reduce((sum, m) => sum + m.downtime_minutes, 0)
+      }
+    });
+    
+  } catch (error) {
+    console.error('Get real-time efficiency error:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
 module.exports = router;

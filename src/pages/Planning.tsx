@@ -64,7 +64,7 @@ export default function Planning() {
       // Manter compatibilidade com status antigos
       case 'running': return 'bg-green-500 text-white';
       case 'stopped': return 'bg-red-500 text-white';
-      case 'completed': return 'bg-blue-500 text-white';
+      case 'concluida': return 'bg-blue-500 text-white';
       case 'pending': return 'bg-gray-500 text-white';
       default: return 'bg-gray-400 text-white';
     }
@@ -79,7 +79,7 @@ export default function Planning() {
       // Manter compatibilidade com status antigos
       case 'running': return 'Em Produção';
       case 'stopped': return 'Parada';
-      case 'completed': return 'Concluída';
+      case 'concluida': return 'Concluída';
       case 'pending': return 'Planejada';
       default: return 'Desconhecido';
     }

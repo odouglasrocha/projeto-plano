@@ -115,7 +115,7 @@ export default function Production() {
     if (!selectedOrder) return;
     
     try {
-      await updateOrder(selectedOrder, { status: 'completed' });
+      await updateOrder(selectedOrder, { status: 'concluida' });
       toast({
         title: "Produção finalizada",
         description: `Ordem ${currentOrder?.code} foi finalizada.`,
@@ -354,7 +354,7 @@ export default function Production() {
                     onClick={handleStopProduction}
                     variant="outline"
                     className="border-red-500 text-red-600 hover:bg-red-50 h-12 sm:h-16"
-                    disabled={!selectedOrder || currentOrder?.status === 'completed'}
+                    disabled={!selectedOrder || currentOrder?.status === 'concluida'}
                   >
                     <Square className="h-6 w-6 mr-2" />
                     Finalizar
