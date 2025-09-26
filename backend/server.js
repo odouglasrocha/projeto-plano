@@ -29,7 +29,7 @@ app.use(helmet());
 app.use(cors({
   origin: process.env.NODE_ENV === 'production' 
     ? ['https://planing-ita.com', 'https://www.planing-ita.com'] 
-    : ['http://localhost:5173', 'http://localhost:3000', 'http://localhost:8080'],
+    : ['http://localhost:5173', 'http://localhost:3000', 'http://localhost:8080', 'https://planing-ita.com'],
   credentials: true
 }));
 app.use(morgan('combined'));
