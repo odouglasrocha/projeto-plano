@@ -17,6 +17,7 @@ const downtimeTypeRoutes = require('./routes/downtime-types');
 const lossTypeRoutes = require('./routes/loss-types');
 const materialLossRoutes = require('./routes/material-losses');
 const reportRoutes = require('./routes/reports');
+const settingsRoutes = require('./routes/settings');
 
 const app = express();
 
@@ -46,6 +47,7 @@ app.use('/api/downtime-types', downtimeTypeRoutes);
 app.use('/api/loss-types', lossTypeRoutes);
 app.use('/api/material-losses', materialLossRoutes);
 app.use('/api/reports', reportRoutes);
+app.use('/api/settings', settingsRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
