@@ -58,7 +58,7 @@ export default function Dashboard() {
   const enrichedMachines = useMemo(() => {
     return machines.map(machine => {
       const currentOrder = orders.find(order => 
-        order.machine_id === machine._id && order.status === 'em_andamento'
+        order.machine_id?.toString() === machine._id?.toString() && order.status === 'em_andamento'
       );
       
       const produced = currentOrder ? getTotalProduced(currentOrder._id) : 0;

@@ -37,7 +37,7 @@ export default function Machines() {
           const orderMachineId = typeof order.machine_id === 'object' && order.machine_id !== null 
             ? order.machine_id._id 
             : order.machine_id;
-          return orderMachineId === machine._id && order.status === 'running';
+          return orderMachineId?.toString() === machine._id?.toString() && order.status === 'em_andamento';
         });
         
         const produced = currentOrder ? getTotalProduced(currentOrder._id) : 0;
